@@ -1,0 +1,11 @@
+.DS_Store
+
+# Swift build artifacts
+.build/
+.swiftpm/
+/orbit
+
+# Xcode user data and build output
+DerivedData/
+xcuserdata/
+*.xcuserstate
