@@ -4,18 +4,21 @@
 //
 // Detects:
 // - Dial rotation using CoreAudio volume changes
-// - Single press using media commands
-// - Double press using next-track command
-// - Triple press using previous-track command
+// - Single press via toggle, play, and pause media commands
+// - Double press via next-track command
+// - Triple press via previous-track command
+//
+// stdout: JSON Lines events for the Rust backend
+// stderr: Human-readable diagnostic logs
 //
 // Restores the pinned system volume after rotation.
-// Logs detected gestures to the terminal.
 // Does not execute application actions yet.
 
 import AppKit
 import AVFoundation
 import CoreAudio
 import MediaPlayer
+import Foundation
 
 // MARK: - Logging
 
@@ -26,8 +29,33 @@ let timeFormatter: DateFormatter = {
 }()
 
 func log(_ message: String) {
-    print("[\(timeFormatter.string(from: Date()))] \(message)")
-    fflush(stdout)
+    let timestamp = timeFormatter.string(from: Date())
+    fputs("[\(timestamp)] \(message)\n", stderr)
+    fflush(stderr)
+}
+
+// MARK: - Structured event output
+
+struct DialEvent: Encodable {
+    let type: String
+}
+
+func emitEvent(_ type: String) {
+    let event = DialEvent(type: type)
+
+    do {
+        let data = try JSONEncoder().encode(event)
+
+        guard let json = String(data: data, encoding: .utf8) else {
+            log("ERROR: Unable to encode event as UTF-8")
+            return
+        }
+
+        print(json)
+        fflush(stdout)
+    } catch {
+        log("ERROR: Failed to encode event \(type): \(error)")
+    }
 }
 
 // MARK: - CoreAudio volume detection
@@ -99,7 +127,7 @@ func setVolume(_ deviceID: AudioDeviceID, to value: Float32) {
     )
 
     if status != noErr {
-        log("WARNING: failed to restore volume (CoreAudio status \(status))")
+        log("WARNING: Failed to restore volume (CoreAudio status \(status))")
     }
 }
 
@@ -114,14 +142,18 @@ let rotationThreshold: Float32 = 0.015
 func rotationGesture(clockwise: Bool) {
     if clockwise {
         log("GESTURE: rotate clockwise")
+        emitEvent("ROTATE_CW")
     } else {
         log("GESTURE: rotate counter-clockwise")
+        emitEvent("ROTATE_CCW")
     }
 }
 
 let volumeChanged: AudioObjectPropertyListenerBlock = { _, _ in
-    guard dialDevice != 0,
-          let observedVolume = readVolume(dialDevice) else {
+    guard
+        dialDevice != 0,
+        let observedVolume = readVolume(dialDevice)
+    else {
         return
     }
 
@@ -137,7 +169,7 @@ let volumeChanged: AudioObjectPropertyListenerBlock = { _, _ in
         return
     }
 
-    // Restore the original volume before logging the gesture.
+    // Restore the original volume before reporting the gesture.
     isRestoringVolume = true
     setVolume(dialDevice, to: pinnedVolume)
     isRestoringVolume = false
@@ -148,7 +180,7 @@ let volumeChanged: AudioObjectPropertyListenerBlock = { _, _ in
 func attachVolumeListener() {
     var address = volumeAddress()
 
-    // Remove the listener from the previous output device, if any.
+    // Remove the listener from the previous output device.
     if dialDevice != 0 {
         AudioObjectRemovePropertyListenerBlock(
             dialDevice,
@@ -160,9 +192,11 @@ func attachVolumeListener() {
         dialDevice = 0
     }
 
-    guard let deviceID = defaultOutputDevice(),
-          let currentVolume = readVolume(deviceID) else {
-        log("ERROR: unable to read the default output device volume")
+    guard
+        let deviceID = defaultOutputDevice(),
+        let currentVolume = readVolume(deviceID)
+    else {
+        log("ERROR: Unable to read the default output device volume")
         return
     }
 
@@ -180,7 +214,7 @@ func attachVolumeListener() {
         log("Rotation listener ready")
         log("Pinned system volume: \(Int(pinnedVolume * 100))%")
     } else {
-        log("ERROR: failed to attach volume listener (status \(status))")
+        log("ERROR: Failed to attach volume listener (status \(status))")
     }
 }
 
@@ -193,7 +227,7 @@ var defaultDeviceAddress = AudioObjectPropertyAddress(
 
 attachVolumeListener()
 
-AudioObjectAddPropertyListenerBlock(
+let defaultDeviceChangedStatus = AudioObjectAddPropertyListenerBlock(
     AudioObjectID(kAudioObjectSystemObject),
     &defaultDeviceAddress,
     DispatchQueue.main
@@ -202,14 +236,16 @@ AudioObjectAddPropertyListenerBlock(
     attachVolumeListener()
 }
 
+if defaultDeviceChangedStatus != noErr {
+    log("WARNING: Failed to register default output device listener")
+}
+
 // MARK: - Press gesture detection
 
 // A silent audio engine helps this process remain the Now Playing target.
 let audioEngine = AVAudioEngine()
 
-let silenceNode = AVAudioSourceNode {
-    _, _, _, audioBufferList -> OSStatus in
-
+let silenceNode = AVAudioSourceNode { _, _, _, audioBufferList -> OSStatus in
     for buffer in UnsafeMutableAudioBufferListPointer(audioBufferList) {
         if let data = buffer.mData {
             memset(data, 0, Int(buffer.mDataByteSize))
@@ -225,14 +261,17 @@ audioEngine.connect(
     to: audioEngine.mainMixerNode,
     format: nil
 )
+
 audioEngine.mainMixerNode.outputVolume = 0
 
 do {
     try audioEngine.start()
     log("Silent audio engine started")
 } catch {
-    log("WARNING: audio engine failed to start: \(error)")
+    log("WARNING: Audio engine failed to start: \(error)")
 }
+
+// MARK: - Now Playing
 
 func assertNowPlaying() {
     let center = MPNowPlayingInfoCenter.default()
@@ -248,34 +287,41 @@ func assertNowPlaying() {
 
 assertNowPlaying()
 
+// MARK: - Media remote commands
+
 let remoteCommands = MPRemoteCommandCenter.shared()
 
 remoteCommands.togglePlayPauseCommand.addTarget { _ in
     log("GESTURE: single press (toggle play/pause)")
+    emitEvent("PRESS_SINGLE_TOGGLE")
     assertNowPlaying()
     return .success
 }
 
 remoteCommands.playCommand.addTarget { _ in
     log("GESTURE: press (play command)")
+    emitEvent("PRESS_SINGLE_PLAY")
     assertNowPlaying()
     return .success
 }
 
 remoteCommands.pauseCommand.addTarget { _ in
     log("GESTURE: press (pause command)")
+    emitEvent("PRESS_SINGLE_PAUSE")
     assertNowPlaying()
     return .success
 }
 
 remoteCommands.nextTrackCommand.addTarget { _ in
     log("GESTURE: double press (next-track command)")
+    emitEvent("PRESS_DOUBLE")
     assertNowPlaying()
     return .success
 }
 
 remoteCommands.previousTrackCommand.addTarget { _ in
     log("GESTURE: triple press (previous-track command)")
+    emitEvent("PRESS_TRIPLE")
     assertNowPlaying()
     return .success
 }
@@ -291,6 +337,7 @@ RunLoop.main.add(nowPlayingTimer, forMode: .common)
 
 log("Oribit dial detector is running")
 log("Waiting for dial rotation and press gestures...")
+log("JSON Lines events are written to stdout")
 log("Press Ctrl+C in Terminal to stop")
 
 let app = NSApplication.shared

@@ -4,6 +4,7 @@
 .build/
 .swiftpm/
 /orbit
+/cmf-oribit/cmf-oribit/native/macos/orbit
 
 # Xcode user data and build output
 DerivedData/

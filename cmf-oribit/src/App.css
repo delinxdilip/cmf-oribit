@@ -1,0 +1,505 @@
+
+:root {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f1f1f1;
+  background: #0b0b0c;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 360px;
+  min-height: 100vh;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.topbar,
+.brand,
+.status,
+.controls,
+.panel-heading,
+.latest-event,
+.event-row,
+.event-info,
+.mapping-row,
+footer {
+  display: flex;
+  align-items: center;
+}
+
+.topbar,
+.panel-heading,
+.event-row,
+.mapping-row,
+footer {
+  justify-content: space-between;
+}
+
+.topbar {
+  gap: 20px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #262629;
+}
+
+.brand {
+  gap: 12px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid #555;
+  border-radius: 14px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.brand h1,
+.brand p,
+.hero h2,
+.hero-copy,
+.panel h3,
+.panel p {
+  margin: 0;
+}
+
+.brand h1 {
+  font-size: 19px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.brand p,
+.control-hint,
+.panel-description,
+.mapping-info small,
+.event-info span,
+footer {
+  color: #929297;
+  font-size: 12px;
+}
+
+.brand p {
+  margin-top: 4px;
+}
+
+.status {
+  gap: 8px;
+  color: #aaaab0;
+  font-size: 12px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #77777c;
+}
+
+.status-online .status-dot {
+  background: #80e2a1;
+  box-shadow: 0 0 12px #80e2a144;
+}
+
+.status-online {
+  color: #b4edc4;
+}
+
+.hero {
+  padding: 52px 0 38px;
+}
+
+.eyebrow,
+.subtle-label {
+  color: #aaaab0;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.hero h2 {
+  margin-top: 15px;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -0.055em;
+}
+
+.hero-copy {
+  max-width: 440px;
+  margin-top: 16px;
+  color: #a6a6ac;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.controls {
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.primary-button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #f1f1f1;
+  border-radius: 9px;
+  background: #f1f1f1;
+  color: #111;
+  font-weight: 650;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #d9d9dd;
+}
+
+.stop-button {
+  border-color: #4a3434;
+  background: #2a1717;
+  color: #ffcccc;
+}
+
+.stop-button:hover:not(:disabled) {
+  background: #3a2020;
+}
+
+.error-message {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid #6e3434;
+  border-radius: 9px;
+  background: #271515;
+  color: #ffc5c5;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #29292d;
+  border-radius: 14px;
+  background: #121214;
+}
+
+.panel h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.subtle-label {
+  white-space: nowrap;
+}
+
+.latest-event {
+  gap: 15px;
+  min-height: 110px;
+}
+
+.gesture-symbol {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid #39393e;
+  border-radius: 16px;
+  font-size: 30px;
+}
+
+.latest-event strong,
+.event-info strong,
+.mapping-info strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.latest-event p {
+  margin-top: 7px;
+  color: #99999f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.text-button {
+  padding: 4px 0 4px 10px;
+  border: 0;
+  background: transparent;
+  color: #b7b7bd;
+  font-size: 12px;
+}
+
+.text-button:hover {
+  color: #fff;
+}
+
+.event-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.empty-state {
+  padding: 26px 0;
+  color: #8b8b91;
+  font-size: 12px;
+}
+
+.event-row {
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #28282b;
+}
+
+.event-row:last-child {
+  border-bottom: 0;
+}
+
+.event-info {
+  min-width: 0;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.event-info strong {
+  overflow-wrap: anywhere;
+}
+
+.event-info span,
+.event-action {
+  font-size: 11px;
+}
+
+.event-action {
+  color: #b8b8be;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.actions-panel {
+  margin-bottom: 28px;
+}
+
+.panel-description {
+  margin-top: 7px !important;
+  line-height: 1.5;
+}
+
+.mapping-list {
+  margin-top: 12px;
+}
+
+.mapping-row {
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #29292d;
+}
+
+.mapping-row:last-child {
+  border-bottom: 0;
+}
+
+.mapping-info {
+  min-width: 0;
+}
+
+.mapping-info small {
+  display: block;
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.mapping-row select {
+  width: 180px;
+  max-width: 48%;
+  min-height: 36px;
+  padding: 0 8px;
+  border: 1px solid #3b3b40;
+  border-radius: 7px;
+  background: #1a1a1d;
+  color: #eee;
+  font-size: 12px;
+}
+
+.mapping-note {
+  margin-top: 16px !important;
+  color: #85858c;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+footer {
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 0 20px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 20px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding-top: 38px;
+  }
+}
+
+@media (max-width: 460px) {
+  .status {
+    font-size: 0;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .mapping-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mapping-row select {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+
+/* --- Oribit radial dial prototype --- */
+.preview-button {
+  min-height: 42px; padding: 0 16px; border: 1px solid #414149;
+  border-radius: 9px; background: #17171b; color: #f0f0f4; font-weight: 550;
+}
+.preview-button:hover { border-color: #777780; background: #222228; }
+.dial-overlay {
+  position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at 50% 42%, rgba(92,100,125,.18), transparent 45%), rgba(5,6,10,.78);
+  backdrop-filter: blur(22px) saturate(135%); -webkit-backdrop-filter: blur(22px) saturate(135%);
+  animation: dial-overlay-in 180ms ease-out both;
+}
+.dial-stage {
+  width: min(760px, 100%); padding: 24px 28px 18px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.16); border-radius: 30px;
+  background: linear-gradient(145deg, rgba(48,50,60,.72), rgba(17,18,23,.88) 56%, rgba(31,32,40,.78));
+  box-shadow: 0 36px 100px rgba(0,0,0,.52), inset 0 1px 0 rgba(255,255,255,.11);
+  backdrop-filter: blur(36px) saturate(160%); -webkit-backdrop-filter: blur(36px) saturate(160%);
+  animation: dial-stage-in 260ms cubic-bezier(.2,.8,.2,1) both;
+}
+.dial-heading { display:flex; align-items:center; justify-content:space-between; }
+.dial-kicker { color:rgba(232,234,244,.58); font-size:9px; font-weight:650; letter-spacing:.2em; }
+.dial-close {
+  display:grid; width:32px; height:32px; place-items:center; border:1px solid rgba(255,255,255,.13);
+  border-radius:50%; background:rgba(255,255,255,.07); color:rgba(255,255,255,.8); font-size:22px; line-height:1;
+}
+.dial-close:hover { background:rgba(255,255,255,.16); }
+.radial-wheel {
+  position:relative; width:min(390px,100%); aspect-ratio:1; margin:8px auto 2px; border-radius:50%;
+  background:radial-gradient(circle at 50% 45%, rgba(255,255,255,.035), transparent 56%);
+}
+.wheel-orbit {
+  position:absolute; top:50%; left:50%; border:1px solid rgba(255,255,255,.075);
+  border-radius:50%; transform:translate(-50%,-50%); pointer-events:none;
+}
+.wheel-orbit-outer { width:84%; height:84%; }
+.wheel-orbit-inner { width:52%; height:52%; border-color:rgba(255,255,255,.045); }
+.wheel-action {
+  position:absolute; z-index:2; display:flex; width:88px; min-height:78px; align-items:center;
+  justify-content:center; flex-direction:column; gap:7px; padding:8px 4px;
+  border:1px solid rgba(255,255,255,.10); border-radius:22px; background:rgba(255,255,255,.055);
+  color:rgba(245,246,251,.76); transform:translate(-50%,-50%);
+  transition:background 160ms ease,border-color 160ms ease,box-shadow 160ms ease,color 160ms ease,scale 160ms ease;
+}
+.wheel-action:hover { background:rgba(255,255,255,.12); color:#fff; scale:1.04; }
+.wheel-action-selected {
+  border-color:rgba(220,229,255,.7);
+  background:linear-gradient(145deg,rgba(239,243,255,.25),rgba(157,177,230,.12)); color:#fff;
+  box-shadow:0 0 0 4px rgba(198,213,255,.055),0 0 28px rgba(154,178,255,.16),inset 0 1px 0 rgba(255,255,255,.19);
+}
+.wheel-action-icon { display:grid; width:28px; height:28px; place-items:center; font-size:23px; line-height:1; }
+.wheel-action-label { max-width:100%; font-size:10px; font-weight:550; line-height:1.15; text-align:center; white-space:nowrap; }
+.wheel-center {
+  position:absolute; top:50%; left:50%; z-index:1; display:flex; width:132px; height:132px;
+  align-items:center; justify-content:center; flex-direction:column; gap:5px; border:1px solid rgba(255,255,255,.14);
+  border-radius:50%; background:radial-gradient(circle at 35% 20%,rgba(255,255,255,.13),transparent 50%),rgba(18,19,25,.8);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 10px 35px rgba(0,0,0,.25);
+  transform:translate(-50%,-50%); pointer-events:none;
+}
+.wheel-center-mark {
+  display:grid; width:32px; height:32px; place-items:center; border:1px solid rgba(255,255,255,.28);
+  border-radius:11px; color:#fff; font-size:19px; font-weight:750;
+}
+.wheel-center strong { font-size:13px; letter-spacing:.14em; text-transform:uppercase; }
+.wheel-center span { max-width:105px; overflow:hidden; color:rgba(232,234,244,.62); font-size:9px; text-overflow:ellipsis; white-space:nowrap; }
+.dial-footer {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:24px; padding:18px 4px 8px;
+  border-top:1px solid rgba(255,255,255,.09);
+}
+.dial-selected-copy { min-width:0; }
+.dial-selected-copy strong { display:block; margin-top:7px; font-size:16px; font-weight:600; }
+.dial-selected-copy p { margin:5px 0 0; color:rgba(232,234,244,.58); font-size:11px; line-height:1.5; }
+.dial-hints { display:grid; flex-shrink:0; gap:7px; color:rgba(232,234,244,.62); font-size:10px; }
+.dial-hints span { display:flex; align-items:center; gap:7px; }
+.dial-hints kbd {
+  display:inline-grid; min-width:24px; height:21px; place-items:center; padding:0 5px;
+  border:1px solid rgba(255,255,255,.13); border-radius:6px; background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.85); font:inherit;
+}
+.dial-prototype-note { margin:12px 0 0; color:rgba(232,234,244,.35); font-size:8px; letter-spacing:.16em; text-align:center; }
+@keyframes dial-overlay-in { from {opacity:0} to {opacity:1} }
+@keyframes dial-stage-in { from {opacity:0;transform:translateY(8px) scale(.975)} to {opacity:1;transform:translateY(0) scale(1)} }
+@media (max-width:600px) {
+  .dial-overlay { padding:12px; }
+  .dial-stage { padding:18px 12px 14px; border-radius:22px; }
+  .radial-wheel { width:min(340px,100%); margin-top:4px; }
+  .wheel-action { width:72px; min-height:68px; border-radius:18px; }
+  .wheel-action-label { font-size:9px; }
+  .dial-footer { flex-direction:column; gap:14px; }
+  .dial-hints { grid-template-columns:1fr 1fr; gap:8px 12px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .dial-overlay,.dial-stage { animation:none; }
+  .wheel-action { transition:none; }
+}
